@@ -13,7 +13,7 @@
 char ssid[] = SECRET_SSID;  // your WPA2 enterprise network SSID (name)
 char user[] = SECRET_USER;  // your WPA2 enterprise username
 char pass[] = SECRET_PASS;  // your WPA2 enterprise password
-char identity[] = SECRET_USER;
+char identity[] = "";
 char caCert[] = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIF3jCCA8agAwIBAgIQAf1tMPyjylGoG7xkDjUDLTANBgkqhkiG9w0BAQwFADCB
@@ -78,10 +78,11 @@ void setup() {
     // Connect to WPA2 enterprise network:
     // - You can optionally provide additional identity and CA cert (string) parameters if your network requires them:
     //      WiFi.beginEnterprise(ssid, user, pass, identity, caCert)
-    status = WiFi.beginEnterprise(ssid, user, pass, NULL, caCert);
+    //status = WiFi.beginEnterprise(ssid, user, pass, identity, caCert);
+    status = WiFi.beginEnterprise(ssid, user, pass);
 
     // wait 10 seconds for connection:
-    delay(10000);
+    delay(30000);
   }
 
   // you're connected now, so print out the data:
