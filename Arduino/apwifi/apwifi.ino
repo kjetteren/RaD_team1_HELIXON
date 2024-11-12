@@ -24,7 +24,6 @@ char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                // your network key index number (needed only for WEP)
 
-int led =  LED_BUILTIN;
 int status = WL_IDLE_STATUS;
 WiFiServer server(80);
 
@@ -36,8 +35,6 @@ void setup() {
   }
 
   Serial.println("Access Point Web Server");
-
-  pinMode(led, OUTPUT);      // set the LED pin mode
 
   // check for the WiFi module:
   if (WiFi.status() == WL_NO_MODULE) {
@@ -115,8 +112,8 @@ void loop() {
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/H\">here</a> turn the LED on<br>");
-            client.print("Click <a href=\"/L\">here</a> turn the LED off<br>");
+            client.print("Click <a href=\"/H\">here</a> send the /H message<br>");
+            client.print("Click <a href=\"/L\">here</a> send the /L message<br>");
 
             // The HTTP response ends with another blank line:
             client.println();
@@ -133,10 +130,10 @@ void loop() {
 
         // Check to see if the client request was "GET /H" or "GET /L":
         if (currentLine.endsWith("GET /H")) {
-          digitalWrite(led, HIGH);               // GET /H turns the LED on
+          Serial.println("GET /H was accessed");       // GET /H
         }
         if (currentLine.endsWith("GET /L")) {
-          digitalWrite(led, LOW);                // GET /L turns the LED off
+          Serial.println("GET /H was accessed");       // GET /L
         }
       }
     }
