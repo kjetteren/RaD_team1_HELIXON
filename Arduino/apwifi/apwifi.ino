@@ -75,9 +75,7 @@ void setup() {
 
 
 void loop() {
-  int packetSize = udp.parsePacket(); // Check for incoming packets
-
-  if (packetSize) {
+  if (udp.parsePacket()) {
     // Packet received
     receivedPackets++;
     Serial.print("Received packet #");
@@ -110,8 +108,6 @@ void printWiFiStatus() {
   Serial.print("IP Address: ");
   Serial.println(ip);
 
-  // print where to go in a browser:
-  Serial.print("To see this page in action, open a browser to http://");
-  Serial.println(ip);
-
+  // print next instruction:
+  Serial.print("To start the test, run the udptest.py");
 }
