@@ -20,6 +20,8 @@ int keyIndex = 0;                // your network key index number (needed only f
 WiFiUDP udp;                      // UDP object
 unsigned int localPort = 12345;   // Port to listen on
 
+int status = WL_IDLE_STATUS;
+
 int receivedPackets = 0;          // Counts received packets
 int expectedPackets = 100;        // Expected number of packets to receive
 
