@@ -9,3 +9,9 @@ def update(P,H,R,x,z):
     x += np.dot(K, ( z - np.dot(H,x)))
     P = np.dot(np.dot(K, H), P)
 
+def set_up_spiral(R=4.125, N=3.3, H=13, T=1300):
+	true_position = np.array([[-R * np.cos(i * (2 * np.pi * N) / T),  R * np.sin(i * (2 * np.pi * N) / T), (i / T) * H] for i in range(T)])
+	
+	return true_position
+	
+
