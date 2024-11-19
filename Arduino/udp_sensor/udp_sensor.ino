@@ -94,4 +94,6 @@ void loop() {
   Udp.beginPacket(udpAddress, localPort);
   Udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
   Udp.endPacket();
+
+  delay(40);
 }
