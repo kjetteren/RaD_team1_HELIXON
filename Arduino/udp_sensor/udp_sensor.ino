@@ -82,35 +82,16 @@ void loop() {
   pressure = bmp.readPressure();
   temperature = bmp.readTemperature();
 
-  a_x = acceleration.x();
-  a_y = acceleration.y();
-  a_z = acceleration.z();
-  m_x = magneto.x();
-  m_y = magneto.y();
-  m_z = magneto.z();
-  omega_x = gyro.x();
-  omega_y = gyro.y();
-  omega_z = gyro.z();
-  g_x = gravity.x();
-  g_y = gravity.y();
-  g_z = gravity.z();
+  float data[] = {
+      accel.acceleration.x, accel.acceleration.y, accel.acceleration.z,
+      mag.magnetic.x, mag.magnetic.y, mag.magnetic.z,
+      gyro.gyro.x, gyro.gyro.y, gyro.gyro.z,
+      gravity.acceleration.x, gravity.acceleration.y, gravity.acceleration.z,
+      pressure, temperature
+    };
 
+  // Send data via UDP
   Udp.beginPacket(udpAddress, localPort);
-
-  Udp.write(a_x)
-  Udp.write(a_y)
-  Udp.write(a_z)
-  Udp.write(m_x)
-  Udp.write(m_y)
-  Udp.write(m_z)
-  Udp.write(omega_x)
-  Udp.write(omega_y)
-  Udp.write(omega_z)
-  Udp.write(g_x)
-  Udp.write(g_y)
-  Udp.write(g_z)
-  Udp.write(pressure)
-  Udp.write(temperature)
-
+  Udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
   Udp.endPacket();
 }
