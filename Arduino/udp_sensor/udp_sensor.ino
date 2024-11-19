@@ -73,16 +73,15 @@ void loop() {
 
   if (client) {
     udpAddress = client.remoteIP(); // get client's IP
-  }
 
-  acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-  magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
-  pressure = bmp.readPressure();
-  temperature = bmp.readTemperature();
+    acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
+    pressure = bmp.readPressure();
+    temperature = bmp.readTemperature();
 
-  float data[] = {
+    float data[] = {
       accel.acceleration.x, accel.acceleration.y, accel.acceleration.z,
       mag.magnetic.x, mag.magnetic.y, mag.magnetic.z,
       gyro.gyro.x, gyro.gyro.y, gyro.gyro.z,
@@ -90,10 +89,11 @@ void loop() {
       pressure, temperature
     };
 
-  // Send data via UDP
-  Udp.beginPacket(udpAddress, localPort);
-  Udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
-  Udp.endPacket();
+    // Send data via UDP
+    Udp.beginPacket(udpAddress, localPort);
+    Udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
+    Udp.endPacket();
+  }
 
   delay(40);
 }
