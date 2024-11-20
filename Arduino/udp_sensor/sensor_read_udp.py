@@ -2,7 +2,7 @@ import socket
 import struct
 
 # UDP Configuration
-UDP_IP = "192.168.4.1" # Default Arduino IP
+UDP_IP = "192.168.4.2" # this device IP
 UDP_PORT = 12345
 BUFFER_SIZE = 56  # 14 floats x 4 bytes
 

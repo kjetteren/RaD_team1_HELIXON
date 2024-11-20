@@ -23,9 +23,8 @@ char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;        // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 WiFiUDP udp;                      // UDP object
-unsigned int localPort = 12345;   // Port to listen on
 int status = WL_IDLE_STATUS;
-IPAddress udpAddress;
+unsigned int localPort = 12345;
 
 // sensor setup
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28); // BNO055 has an I2C address of 0x28 by default
@@ -37,6 +36,19 @@ imu::Vector<3> gyro;
 imu::Vector<3> acceleration;
 
 void setup() {
+  Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+
+  if (!bno.begin()) {
+    //while (1);
+  }
+
+  if (!bmp.begin_I2C()) {
+    //while (1); 
+  }
+
   bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_2X);
   bmp.setPressureOversampling(BMP3_OVERSAMPLING_16X);
   bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
@@ -47,6 +59,7 @@ void setup() {
   // check for the WiFi module:
   if (WiFi.status() == WL_NO_MODULE) {
     // don't continue
+    Serial.println("Fail 1");
     while (true);
   }
 
@@ -54,12 +67,17 @@ void setup() {
   // you can override it with the following:
   // WiFi.config(IPAddress(10, 0, 0, 1));
 
+  Serial.println("start AP");
+
   // Create open network. Change this line if you want to create an WEP network:
   status = WiFi.beginAP(ssid, pass);
   if (status != WL_AP_LISTENING) {
     // don't continue
+    Serial.println("Fail 1");
     while (true);
   }
+
+  Serial.println("wait for 5");
 
   // wait 5 seconds for connection:
   delay(5000);
@@ -69,10 +87,7 @@ void setup() {
 }
 
 void loop() {
-  WiFiClient client = WiFi.available();
-
-  if (client) {
-    udpAddress = client.remoteIP(); // get client's IP
+  Serial.println("Measurement");
 
     acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
@@ -82,18 +97,16 @@ void loop() {
     temperature = bmp.readTemperature();
 
     float data[] = {
-      accel.acceleration.x, accel.acceleration.y, accel.acceleration.z,
-      mag.magnetic.x, mag.magnetic.y, mag.magnetic.z,
-      gyro.gyro.x, gyro.gyro.y, gyro.gyro.z,
-      gravity.acceleration.x, gravity.acceleration.y, gravity.acceleration.z,
+      acceleration.x(), acceleration.y(), acceleration.z(),
+      magneto.x(), magneto.y(), magneto.z(),
+      gyro.x(), gyro.y(), gyro.z(),
+      gravity.x(), gravity.y(), gravity.z(),
       pressure, temperature
     };
 
-    // Send data via UDP
-    udp.beginPacket(udpAddress, localPort);
+    udp.beginPacket("192.168.4.2", localPort);
     udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
     udp.endPacket();
-  }
 
-  delay(40);
+    delay(1000);
 }
