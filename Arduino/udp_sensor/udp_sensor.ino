@@ -80,33 +80,37 @@ void setup() {
   Serial.println("wait for 5");
 
   // wait 5 seconds for connection:
-  delay(5000);
+  delay(1000);
 
   // start listening to the specified port
   udp.begin(localPort);
+
+  while (udp.parsePacket() < 1);
+  
+  delay(100);
 }
 
 void loop() {
-  Serial.println("Measurement");
+  Serial.println("Measure");
+  
+  acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+  gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
+  pressure = bmp.readPressure();
+  temperature = bmp.readTemperature();
 
-    acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-    magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
-    pressure = bmp.readPressure();
-    temperature = bmp.readTemperature();
+  float data[] = {
+    acceleration.x(), acceleration.y(), acceleration.z(),
+    magneto.x(), magneto.y(), magneto.z(),
+    gyro.x(), gyro.y(), gyro.z(),
+    gravity.x(), gravity.y(), gravity.z(),
+    pressure, temperature
+  };
 
-    float data[] = {
-      acceleration.x(), acceleration.y(), acceleration.z(),
-      magneto.x(), magneto.y(), magneto.z(),
-      gyro.x(), gyro.y(), gyro.z(),
-      gravity.x(), gravity.y(), gravity.z(),
-      pressure, temperature
-    };
+  udp.beginPacket("192.168.4.2", localPort);
+  udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
+  udp.endPacket();
 
-    udp.beginPacket("192.168.4.2", localPort);
-    udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
-    udp.endPacket();
-
-    delay(1000);
+  delay(40);
 }

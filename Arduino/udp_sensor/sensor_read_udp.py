@@ -2,11 +2,16 @@ import socket
 import struct
 
 # UDP Configuration
-UDP_IP = "192.168.4.2" # this device IP
+UDP_IP = "" # any IP bind
 UDP_PORT = 12345
 BUFFER_SIZE = 56  # 14 floats x 4 bytes
 
-# Create UDP socket
+# Sending Socket
+send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+start_message = ""
+send_sock.sendto(start_message.encode(), ("192.168.4.1", UDP_PORT))
+
+# Receiving Socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
 
