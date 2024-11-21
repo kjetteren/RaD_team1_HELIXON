@@ -35,12 +35,11 @@ imu::Vector<3> gravity;
 imu::Vector<3> gyro;
 imu::Vector<3> acceleration;
 
-void setup() {
-  Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+static unsigned long previousMillis = 0; // Tracks the last loop execution time
+const unsigned long interval = 40;       // 25 Hz = 40 ms
+unsigned long currentMillis = 0;
 
+void setup() {
   if (!bno.begin()) {
     while (1);
   }
@@ -74,26 +73,29 @@ void setup() {
 }
 
 void loop() {
-  acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-  magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-  gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
-  pressure = bmp.readPressure();
-  temperature = bmp.readTemperature();
+  currentMillis = millis();
 
-  float data[] = {
-    acceleration.x(), acceleration.y(), acceleration.z(),
-    magneto.x(), magneto.y(), magneto.z(),
-    gyro.x(), gyro.y(), gyro.z(),
-    gravity.x(), gravity.y(), gravity.z(),
-    pressure, temperature
-  };
+  // Check if the interval has elapsed
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
 
-  udp.beginPacket("192.168.4.2", localPort);
-  udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
-  udp.endPacket();
+    acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
+    pressure = bmp.readPressure();
+    temperature = bmp.readTemperature();
 
-  Serial.println("Measure");
+    float data[] = {
+      acceleration.x(), acceleration.y(), acceleration.z(),
+      magneto.x(), magneto.y(), magneto.z(),
+      gyro.x(), gyro.y(), gyro.z(),
+      gravity.x(), gravity.y(), gravity.z(),
+      pressure, temperature
+    };
 
-  delay(40);
+    udp.beginPacket("192.168.4.2", localPort);
+    udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
+    udp.endPacket();
+  }
 }
