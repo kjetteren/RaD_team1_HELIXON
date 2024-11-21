@@ -42,11 +42,11 @@ void setup() {
   }
 
   if (!bno.begin()) {
-    //while (1);
+    while (1);
   }
 
   if (!bmp.begin_I2C()) {
-    //while (1); 
+    while (1); 
   }
 
   bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_2X);
@@ -58,41 +58,22 @@ void setup() {
 
   // check for the WiFi module:
   if (WiFi.status() == WL_NO_MODULE) {
-    // don't continue
-    Serial.println("Fail 1");
     while (true);
   }
 
-  // by default the local IP address will be 192.168.4.1
-  // you can override it with the following:
-  // WiFi.config(IPAddress(10, 0, 0, 1));
-
-  Serial.println("start AP");
-
-  // Create open network. Change this line if you want to create an WEP network:
+  // Create access point:
   status = WiFi.beginAP(ssid, pass);
   if (status != WL_AP_LISTENING) {
-    // don't continue
-    Serial.println("Fail 1");
     while (true);
   }
-
-  Serial.println("wait for 5");
-
-  // wait 5 seconds for connection:
-  delay(1000);
 
   // start listening to the specified port
   udp.begin(localPort);
 
   while (udp.parsePacket() < 1);
-  
-  delay(100);
 }
 
 void loop() {
-  Serial.println("Measure");
-  
   acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
   magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
   gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
@@ -111,6 +92,8 @@ void loop() {
   udp.beginPacket("192.168.4.2", localPort);
   udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
   udp.endPacket();
+
+  Serial.println("Measure");
 
   delay(40);
 }

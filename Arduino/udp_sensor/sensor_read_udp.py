@@ -8,7 +8,7 @@ BUFFER_SIZE = 56  # 14 floats x 4 bytes
 
 # Sending Socket
 send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-start_message = ""
+start_message = "0"
 send_sock.sendto(start_message.encode(), ("192.168.4.1", UDP_PORT))
 
 # Receiving Socket
