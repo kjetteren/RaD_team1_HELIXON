@@ -34,6 +34,7 @@ imu::Vector<3> magneto;
 imu::Vector<3> gravity;
 imu::Vector<3> gyro;
 imu::Vector<3> acceleration;
+imu::Quaternion quat;
 
 static unsigned long previousMillis = 0; // Tracks the last loop execution time
 const unsigned long interval = 40;       // 25 Hz = 40 ms
@@ -85,12 +86,14 @@ void loop() {
     gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
     pressure = bmp.readPressure();
     temperature = bmp.readTemperature();
+    quat = bno.getQuat();
 
     float data[] = {
       acceleration.x(), acceleration.y(), acceleration.z(),
       magneto.x(), magneto.y(), magneto.z(),
       gyro.x(), gyro.y(), gyro.z(),
       gravity.x(), gravity.y(), gravity.z(),
+      quat.w(),quat.x(),quat.y(),quat.z(),
       pressure, temperature
     };
 
