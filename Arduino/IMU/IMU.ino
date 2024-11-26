@@ -5,7 +5,7 @@
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28); // BNO055 has an I2C address of 0x28 by default
 Adafruit_BMP3XX bmp;
-float a_x,a_y,a_z,m_x,m_y,m_z,omega_x,omega_y,omega_z,g_x,g_y,g_z,pressure,temperature;
+float a_x,a_y,a_z,m_x,m_y,m_z,omega_x,omega_y,omega_z,g_x,g_y,g_z,q_w,q_x,q_y,q_z,pressure,temperature;
 imu::Vector<3> magneto;
 imu::Vector<3> gravity;
 imu::Vector<3> gyro;
@@ -49,9 +49,14 @@ void loop() {
   g_x = gravity.x();
   g_y = gravity.y();
   g_z = gravity.z();
+  imu::Quaternion quat = bno.getQuat();
+  q_w = quat.w();
+  q_x = quat.x();
+  q_y = quat.y();
+  q_z = quat.z();
   pressure = bmp.readPressure();
   temperature = bmp.readTemperature();
-  
+
   Serial.print(a_x); Serial.print(",");
   Serial.print(a_y); Serial.print(",");
   Serial.print(a_z); Serial.print(",");
@@ -64,6 +69,11 @@ void loop() {
   Serial.print(g_x); Serial.print(",");
   Serial.print(g_y); Serial.print(",");
   Serial.print(g_z); Serial.print(",");
+  Serial.print(q_w); Serial.print(",");
+  Serial.print(q_x); Serial.print(",");
+  Serial.print(q_y); Serial.print(",");
+  Serial.print(q_z); Serial.print(",");
   Serial.print(pressure); Serial.print(",");
   Serial.println(temperature);
 }
+
