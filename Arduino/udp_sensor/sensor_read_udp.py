@@ -5,7 +5,7 @@ import struct
 # UDP Configuration
 UDP_IP = "" # any IP bind
 UDP_PORT = 12345
-BUFFER_SIZE = 72  # 18 floats x 4 bytes
+BUFFER_SIZE = 76  # 18 floats x 4 bytes + 1 long x 4 bytes (Time)
 
 with open("sensor_data.csv", mode="w", newline="") as file:
     csv_writer = csv.writer(file)
@@ -17,7 +17,7 @@ with open("sensor_data.csv", mode="w", newline="") as file:
         "Gyro_X", "Gyro_Y", "Gyro_Z",
         "Gravity_X", "Gravity_Y", "Gravity_Z",
         "Quaternion_W", "Quaternion_X", "Quaternion_Y", "Quaternion_Z",
-        "Pressure", "Temperature"
+        "Pressure", "Temperature", "Time"
     ])
 
     # Sending Socket
@@ -31,5 +31,5 @@ with open("sensor_data.csv", mode="w", newline="") as file:
 
     while True:
         data, addr = sock.recvfrom(BUFFER_SIZE)
-        float_data = struct.unpack('f' * 18, data)
+        float_data = struct.unpack('f' * 19, data)
         csv_writer.writerow(float_data)

@@ -94,11 +94,11 @@ void loop() {
       gyro.x(), gyro.y(), gyro.z(),
       gravity.x(), gravity.y(), gravity.z(),
       quat.w(),quat.x(),quat.y(),quat.z(),
-      pressure, temperature
+      pressure, temperature, previousMillis
     };
 
     udp.beginPacket("192.168.4.2", localPort);
-    udp.write((uint8_t*)data, sizeof(data)); // Send float array as bytes
+    udp.write((uint8_t*)data, sizeof(data)); //Send float array as bytes
     udp.endPacket();
   }
 }
