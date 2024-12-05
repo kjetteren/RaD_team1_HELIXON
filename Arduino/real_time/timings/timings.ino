@@ -54,10 +54,14 @@ void setup() {
   udp.begin(localPort);
 
   while (udp.parsePacket() < 1); // Wait for Python to send start time
-  udp.read((uint8_t*)&pc_start_time, sizeof(pc_start_time)); // Receive Python's start time
+    udp.read((uint8_t*)&pc_start_time, sizeof(pc_start_time)); // Read as float
+
+  Serial.begin(9600); // Initialize serial monitor
+  while (!Serial); // Wait for serial connection
 }
 
 void loop() {
+
   currentMillis = millis();
 
   if (currentMillis - previousMillis >= interval) {
@@ -77,5 +81,8 @@ void loop() {
     udp.beginPacket("192.168.4.2", localPort);
     udp.write((uint8_t*)data, sizeof(data));
     udp.endPacket();
+
+    Serial.print("PC Start Time: ");
+    Serial.println(pc_start_time, 6);
   }
 }
