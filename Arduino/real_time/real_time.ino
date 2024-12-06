@@ -29,12 +29,16 @@ unsigned int localPort = 12345;
 // sensor setup
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28); // BNO055 has an I2C address of 0x28 by default
 Adafruit_BMP3XX bmp;
-float /*a_x,a_y,a_z,m_x,m_y,m_z,omega_x,omega_y,omega_z,g_x,g_y,g_z,*/pressure,temperature;
-//imu::Vector<3> magneto;
-//imu::Vector<3> gravity;
-//imu::Vector<3> gyro;
-//imu::Vector<3> acceleration;
+float a_x,a_y,a_z,m_x,m_y,m_z,omega_x,omega_y,omega_z,g_x,g_y,g_z,pressure,temperature;
+imu::Vector<3> magneto;
+imu::Vector<3> gravity;
+imu::Vector<3> gyro;
+imu::Vector<3> acceleration;
 imu::Quaternion quat;
+uint8_t s = 0;
+uint8_t g = 0;
+uint8_t a = 0; 
+uint8_t m = 0;
 
 static unsigned long previousMillis = 0; // Tracks the last loop execution time
 const unsigned long interval = 40;       // 25 Hz = 40 ms
@@ -61,6 +65,11 @@ void setup() {
     while (true);
   }
 
+  while(true) {
+    bno.getCalibration(&s, &g, &a, &m);
+    if(s == 3){break;}
+  }
+
   // Create access point:
   status = WiFi.beginAP(ssid, pass);
   if (status != WL_AP_LISTENING) {
@@ -80,21 +89,21 @@ void loop() {
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
 
-/*     acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    acceleration = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     magneto = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
     gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY); */
+    gravity = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
     pressure = bmp.readPressure();
     temperature = bmp.readTemperature();
     quat = bno.getQuat();
 
     float data[] = {
-/*       acceleration.x(), acceleration.y(), acceleration.z(),
+      acceleration.x(), acceleration.y(), acceleration.z(),
       magneto.x(), magneto.y(), magneto.z(),
       gyro.x(), gyro.y(), gyro.z(),
-      gravity.x(), gravity.y(), gravity.z(), */
+      gravity.x(), gravity.y(), gravity.z(),
       quat.w(),quat.x(),quat.y(),quat.z(),
-      pressure, temperature, /* previousMillis */
+      pressure, temperature
     };
 
     udp.beginPacket("192.168.4.2", localPort);
