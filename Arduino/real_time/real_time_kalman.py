@@ -29,7 +29,7 @@ ax.set_ylim(-1, 1)
 # UDP Configuration
 UDP_IP = "" # any IP bind
 UDP_PORT = 12345
-BUFFER_SIZE = 24  # 6 floats x 4 bytes
+BUFFER_SIZE = 72  # 18 floats x 4 bytes
 
 send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 start_message = "0"
@@ -44,9 +44,9 @@ ukf_data = {i: [] for i in range(4)}
 
 while True:
     data, addr = sock.recvfrom(BUFFER_SIZE)
-    float_data = struct.unpack('f' * 6, data)
-    w, x, y, z, pressure, temperature = float_data
-    q = np.array([w, x, y, z], np.float32)
+    float_data = struct.unpack('f' * 18, data)
+    a_x, a_y, a_z, m_x, m_y, m_z, gy_x, gy_y, gy_z, gr_x, gr_y, gr_z, q_w, q_x, q_y, q_z, pressure, temperature = float_data
+    q = np.array([q_w, q_x, q_y, q_z], np.float32)
     q = q / np.linalg.norm(q)
     ukf.predict()
     ukf.update(q)
