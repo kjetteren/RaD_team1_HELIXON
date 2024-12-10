@@ -7,7 +7,7 @@ UDP_IP = "" # any IP bind
 UDP_PORT = 12345
 BUFFER_SIZE = 76  # 18 floats x 4 bytes + 1 long x 4 bytes (Time)
 
-with open("sensor_data.csv", mode="w", newline="") as file:
+with open("rotation_y.csv", mode="w", newline="") as file:
     csv_writer = csv.writer(file)
 
     # Write the header row (this will be written every time the file is created)

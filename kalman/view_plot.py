@@ -1,6 +1,32 @@
 import numpy as np
 import plotly.graph_objs as go
 from scipy.spatial.transform import Rotation as R
+from collections import deque
+
+import socket
+import struct
+
+def quaternion_to_euler_angles(q):
+    """
+    Convert quaternion to Euler angles (roll, pitch, yaw) in radians.
+    Quaternion format assumed as [w, x, y, z].
+    """
+    w, x, y, z = q
+    # Roll (x-axis rotation)
+    sinr_cosp = 2 * (w * x + y * z)
+    cosr_cosp = 1 - 2 * (x * x + y * y)
+    roll = np.arctan2(sinr_cosp, cosr_cosp)
+
+    # Pitch (y-axis rotation)
+    sinp = 2 * (w * y - z * x)
+    pitch = np.arcsin(sinp) if abs(sinp) <= 1 else np.pi / 2 * np.sign(sinp)
+
+    # Yaw (z-axis rotation)
+    siny_cosp = 2 * (w * z + x * y)
+    cosy_cosp = 1 - 2 * (y * y + z * z)
+    yaw = np.arctan2(siny_cosp, cosy_cosp)
+
+    return roll, pitch, yaw
 
 def compute_vector(roll, pitch, yaw):
     # unit vector in z direction
@@ -111,3 +137,41 @@ def generate_plot(roll,pitch,yaw, step):
     )
 
     fig.show()
+
+
+def generate_plot_realtime(step):
+
+    # Define constants
+    UDP_IP = "0.0.0.0"  # Replace with your desired IP
+    UDP_PORT = 12345    # Replace with your port number
+    BUFFER_SIZE = 76    # 19 floats * 4 bytes per float = 76 bytes
+
+    rolls = deque(maxlen=100)
+    pitches = deque(maxlen=100)
+    yaws = deque(maxlen=100)
+
+    # Sending Socket
+    send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    start_message = "0"
+    send_sock.sendto(start_message.encode(), ("192.168.4.1", UDP_PORT))
+
+    # Receiving Socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((UDP_IP, UDP_PORT))
+
+    try:
+        while True:
+            data, addr = sock.recvfrom(BUFFER_SIZE)  # Receive data from the sensor
+            float_data = struct.unpack('f' * 19, data)  # Unpack 19 floats from the data
+            quaternion = float_data[12:16] 
+            roll, pitch, yaw = quaternion_to_euler_angles(quaternion)
+            rolls.append(roll)
+            pitches.append(pitch)
+            yaws.append(yaw)
+
+            generate_plot(roll,pitch,yaw, step)
+
+    except KeyboardInterrupt:
+        print("Data collection stopped.")
+
+generate_plot_realtime(20)
