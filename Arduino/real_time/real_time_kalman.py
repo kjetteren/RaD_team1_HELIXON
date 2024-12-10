@@ -42,14 +42,24 @@ sock.bind((UDP_IP, UDP_PORT))
 x_data = []
 ukf_data = {i: [] for i in range(4)}
 
+first = True
+
 while True:
     data, addr = sock.recvfrom(BUFFER_SIZE)
     float_data = struct.unpack('f' * 18, data)
     a_x, a_y, a_z, m_x, m_y, m_z, gy_x, gy_y, gy_z, gr_x, gr_y, gr_z, q_w, q_x, q_y, q_z, pressure, temperature = float_data
     q = np.array([q_w, q_x, q_y, q_z], np.float32)
-    q = q / np.linalg.norm(q)
-    ukf.predict()
-    ukf.update(q)
+    norm = np.linalg.norm(q)
+    if norm is not 0:
+        q = q / np.linalg.norm(q)
+    else:
+        q = q / 1e-10
+    if first:
+        ukf.x = q
+        first = False
+    else:
+        ukf.predict()
+        ukf.update(q)
 
     x_data.append(len(x_data))
     for i in range(4):
