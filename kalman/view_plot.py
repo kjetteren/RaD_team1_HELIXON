@@ -2,6 +2,8 @@ import numpy as np
 import plotly.graph_objs as go
 from scipy.spatial.transform import Rotation as R
 from collections import deque
+import time
+import streamlit as st
 
 import socket
 import struct
@@ -136,12 +138,33 @@ def generate_plot(roll,pitch,yaw, step):
         }]
     )
 
-    fig.show()
+    return fig
 
 
-def generate_plot_realtime(step):
 
-    # Define constants
+def generate_plot_realtime():
+    Fig = st.empty()
+    
+    # Initialize Plotly figure
+    fig = go.Figure()
+    # fig.update_layout(
+    #     autosize=False,
+    #     width=800,
+    #     height=700,
+    #     margin=dict(l=0, r=0, b=0, t=0),
+    #     scene=dict(
+    #         xaxis=dict(range=[-1, 1], autorange=False, tickvals=[-1, -0.5, 0, 0.5, 1], showspikes=False),
+    #         yaxis=dict(range=[-1, 1], autorange=False, tickvals=[-1, -0.5, 0, 0.5, 1], showspikes=False),
+    #         zaxis=dict(range=[-1, 1], autorange=False, tickvals=[-1, -0.5, 0, 0.5, 1], showspikes=False),
+    #         aspectmode='cube',
+    #         camera=dict(
+    #             up=dict(x=0, y=0, z=.5),
+    #             center=dict(x=0, y=0, z=0),
+    #             eye=dict(x=1.25, y=1.25, z=1.25)
+    #         )
+    #     ),
+    # )
+
     UDP_IP = "0.0.0.0"  # Replace with your desired IP
     UDP_PORT = 12345    # Replace with your port number
     BUFFER_SIZE = 76    # 19 floats * 4 bytes per float = 76 bytes
@@ -158,20 +181,119 @@ def generate_plot_realtime(step):
     # Receiving Socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
-
-    try:
-        while True:
+    
+    while True:
+        # Process data
+        try:
             data, addr = sock.recvfrom(BUFFER_SIZE)  # Receive data from the sensor
             float_data = struct.unpack('f' * 19, data)  # Unpack 19 floats from the data
             quaternion = float_data[12:16] 
             roll, pitch, yaw = quaternion_to_euler_angles(quaternion)
+
             rolls.append(roll)
             pitches.append(pitch)
             yaws.append(yaw)
 
-            generate_plot(roll,pitch,yaw, step)
+            x,y,z = compute_vector(roll, pitch, yaw)
 
-    except KeyboardInterrupt:
-        print("Data collection stopped.")
+        except Exception as e:
+            print(f"Error: {e}")
+            continue
 
-generate_plot_realtime(20)
+        fig.data = []
+        fig.add_trace(go.Scatter3d(x=[0, x], y=[0, y], z=[0, z], mode='lines', line=dict(width=10, color='red'), hoverinfo='none'))
+        fig.add_trace(go.Cone(x=[0.9 * x], y=[0.9 * y], z=[0.9 * z], u=[0.1 * x], v=[0.1 * y], w=[0.1 * z], sizemode="scaled", sizeref=2.5, showscale=False, colorscale=[(0, 'red'), (1, 'red')], cmin=-1, cmax=1, hoverinfo='none'))
+
+        with Fig.container():
+            st.plotly_chart(fig, use_container_width=True)
+        time.sleep(1)
+
+def generate_plot_realtime_lesko():
+    # Reserve space for the plot
+    Fig = st.empty()
+
+    # Initialize Plotly figure outside the loop
+    fig = go.Figure()
+    fig.update_layout(
+        autosize=False,
+        width=800,
+        height=700,
+        margin=dict(l=0, r=0, b=0, t=0),
+        scene=dict(
+            xaxis=dict(range=[-1, 1], autorange=False, tickvals=[-1, -0.5, 0, 0.5, 1], showspikes=False),
+            yaxis=dict(range=[-1, 1], autorange=False, tickvals=[-1, -0.5, 0, 0.5, 1], showspikes=False),
+            zaxis=dict(range=[-1, 1], autorange=False, tickvals=[-1, -0.5, 0, 0.5, 1], showspikes=False),
+            aspectmode='cube',
+            camera=dict(
+                up=dict(x=0, y=0, z=.5),
+                center=dict(x=0, y=0, z=0),
+                eye=dict(x=1.25, y=1.25, z=1.25)
+            )
+        ),
+    )
+
+    # Initialize data lists
+    rolls, pitches, yaws = deque(maxlen=100), deque(maxlen=100), deque(maxlen=100)
+
+    # Network setup
+    UDP_IP = "0.0.0.0"  # Replace with your desired IP
+    UDP_PORT = 12345    # Replace with your port number
+    BUFFER_SIZE = 76    # 19 floats * 4 bytes per float = 76 bytes
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((UDP_IP, UDP_PORT))
+
+    # Main loop
+    while True:
+        try:
+            # Read data
+            data, addr = sock.recvfrom(BUFFER_SIZE)
+            float_data = struct.unpack('f' * 19, data)
+            quaternion = float_data[12:16] 
+            roll, pitch, yaw = quaternion_to_euler_angles(quaternion)
+
+            # Append latest data
+            rolls.append(roll)
+            pitches.append(pitch)
+            yaws.append(yaw)
+
+            # Compute rotation vector
+            x, y, z = compute_vector(roll, pitch, yaw)
+
+            # Update Plotly data
+            fig.data = []  # Clear previous traces
+            fig.add_trace(go.Scatter3d(
+                x=[0, x],
+                y=[0, y],
+                z=[0, z],
+                mode='lines',
+                line=dict(width=10, color='red'),
+                hoverinfo='none'
+            ))
+            fig.add_trace(go.Cone(
+                x=[0.9 * x],
+                y=[0.9 * y],
+                z=[0.9 * z],
+                u=[0.1 * x],
+                v=[0.1 * y],
+                w=[0.1 * z],
+                sizemode="scaled",
+                sizeref=2.5,
+                showscale=False,
+                colorscale=[(0, 'red'), (1, 'red')],
+                cmin=-1,
+                cmax=1,
+                hoverinfo='none'
+            ))
+
+            # Update the placeholder with the latest figure
+            with Fig.container():
+                st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
+        except Exception as e:
+            print(f"Error: {e}")
+            continue
+
+        # Introduce a small delay to prevent rapid updates
+        time.sleep(0.1)
+
+generate_plot_realtime()
