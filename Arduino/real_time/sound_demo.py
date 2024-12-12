@@ -31,7 +31,7 @@ context = alcCreateContext(device, None)
 alcMakeContextCurrent(context)
 
 # Load the audio source
-source = oalOpen(os.path.join(os.getcwd(), 'Arduino/real_time/DontYouKnowHowBusyAndImportantIAm_mono.wav'))  # Replace with your audio file path
+source = oalOpen('./DontYouKnowHowBusyAndImportantIAm_mono.wav')  # Replace with your audio file path
 
 # Set the initial position of the source
 source.set_position([1, 0, 0])  # 1 units away on the x-axis
@@ -74,7 +74,6 @@ def receive_data():
             forward = [np.cos(yaw) * np.cos(pitch), np.sin(yaw) * np.cos(pitch), np.sin(pitch)]
             up = [0, 0, 1]  # Assuming up vector is always (0, 0, 1)
             listener.set_orientation(forward + up)
-            print(forward + up)
 
             # Optionally play the sound if not already playing
             if not source.get_state() == AL_PLAYING:
