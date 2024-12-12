@@ -4,7 +4,26 @@ import socket
 import struct
 import threading
 
-from Arduino.real_time.qtoe import quaternion_to_euler
+def quaternion_to_euler(q):
+    """
+    Convert a quaternion into Euler angles (roll, pitch, yaw) in radians
+    q: a 4 element array representing the quaternion (w, x, y, z)
+    """
+    w, x, y, z = q
+    t0 = +2.0 * (w * x + y * z)
+    t1 = +1.0 - 2.0 * (x * x + y * y)
+    roll_x = np.arctan2(t0, t1)
+
+    t2 = +2.0 * (w * y - z * x)
+    t2 = +1.0 if t2 > +1.0 else t2
+    t2 = -1.0 if t2 < -1.0 else t2
+    pitch_y = np.arcsin(t2)
+
+    t3 = +2.0 * (w * z + x * y)
+    t4 = +1.0 - 2.0 * (y * y + z * z)
+    yaw_z = np.arctan2(t3, t4)
+
+    return roll_x, pitch_y, yaw_z
 
 # Initialize OpenAL
 device = alcOpenDevice(None)
@@ -12,7 +31,7 @@ context = alcCreateContext(device, None)
 alcMakeContextCurrent(context)
 
 # Load the audio source
-source = oalOpen('./336598__inspectorj__footsteps-concrete-a_mono.wav')  # Replace with your audio file path
+source = oalOpen(os.path.join(os.getcwd(), 'Arduino/real_time/DontYouKnowHowBusyAndImportantIAm_mono.wav'))  # Replace with your audio file path
 
 # Set the initial position of the source
 source.set_position([1, 0, 0])  # 1 units away on the x-axis
