@@ -4,7 +4,7 @@ from scipy.spatial.transform import Rotation as R
 from collections import deque
 import time
 import streamlit as st
-
+import customize_gui
 import socket
 import struct
 
@@ -118,7 +118,7 @@ def generate_plot(roll,pitch,yaw, step):
                     {
                         'label': 'Play',
                         'method': 'animate',
-                        'args': [None, dict(frame=dict(duration=10, redraw=True), fromcurrent=True)],
+                        'args': [None, dict(frame=dict(duration=50, redraw=True), fromcurrent=True)],
                     },
                     {
                         'label': 'Pause',
@@ -130,7 +130,7 @@ def generate_plot(roll,pitch,yaw, step):
         ],
         sliders=[{
             'steps': [
-                {'args': [[f"frame{k}"], dict(mode='immediate', frame=dict(duration=10, redraw=True))],
+                {'args': [[f"frame{k}"], dict(mode='immediate', frame=dict(duration=50, redraw=True))],
                 'method': 'animate'} for k in range(0, len(roll), step)
             ],
             'currentvalue': {'prefix': 'Time: ', 'font': {'size': 20}},
@@ -143,6 +143,35 @@ def generate_plot(roll,pitch,yaw, step):
 
 
 def generate_plot_realtime():
+    
+    UDP_IP = "0.0.0.0"  # Replace with your desired IP
+    UDP_PORT = 12345    # Replace with your port number
+    BUFFER_SIZE = 76    # 19 floats * 4 bytes per float = 76 bytes
+
+    gui = customize_gui.gui()
+    gui.clean_format(wide=True)
+    gui.about(text="Visualize your IMU data in 3D space.")
+    st.markdown("## IMU Visualizer")
+    _, col2, _ = st.columns([1, 69, 1])
+    with col2:
+        Fig = st.empty()
+    with st.sidebar:
+        "---"
+        st.write("### Valid Data Rate")
+        Rate = st.empty()
+        with Rate: st.write("--")
+        "---"
+        st.write("### Raw Data")
+        Data = st.empty()
+        with Data: st.write("--")
+        "---"
+
+    if "IMU" not in st.session_state:
+        try:
+            st.session_state.IMU = UDP_PORT
+        except Exception as e:
+            st.error("Not Connected")
+
     Fig = st.empty()
     
     # Initialize Plotly figure
@@ -164,10 +193,6 @@ def generate_plot_realtime():
     #         )
     #     ),
     # )
-
-    UDP_IP = "0.0.0.0"  # Replace with your desired IP
-    UDP_PORT = 12345    # Replace with your port number
-    BUFFER_SIZE = 76    # 19 floats * 4 bytes per float = 76 bytes
 
     rolls = deque(maxlen=100)
     pitches = deque(maxlen=100)
@@ -296,4 +321,5 @@ def generate_plot_realtime_lesko():
         # Introduce a small delay to prevent rapid updates
         time.sleep(0.1)
 
-generate_plot_realtime()
+
+# generate_plot_realtime()
