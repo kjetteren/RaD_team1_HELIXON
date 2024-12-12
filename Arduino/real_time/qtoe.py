@@ -2,7 +2,7 @@ import numpy as np
 
 def quaternion_to_euler(q):
     """
-    Convert a quaternion into Euler angles (roll, pitch, yaw) in degrees
+    Convert a quaternion into Euler angles (roll, pitch, yaw) in radians
     q: a 4 element array representing the quaternion (w, x, y, z)
     """
     w, x, y, z = q
@@ -18,10 +18,5 @@ def quaternion_to_euler(q):
     t3 = +2.0 * (w * z + x * y)
     t4 = +1.0 - 2.0 * (y * y + z * z)
     yaw_z = np.arctan2(t3, t4)
-
-    # Convert from radians to degrees
-    roll_x = np.degrees(roll_x)
-    pitch_y = np.degrees(pitch_y)
-    yaw_z = np.degrees(yaw_z)
 
     return roll_x, pitch_y, yaw_z

@@ -3,7 +3,6 @@ import numpy as np
 import socket
 import struct
 import threading
-import time
 
 from Arduino.real_time.qtoe import quaternion_to_euler
 
@@ -13,10 +12,10 @@ context = alcCreateContext(device, None)
 alcMakeContextCurrent(context)
 
 # Load the audio source
-source = oalOpen('./336598__inspectorj__footsteps-concrete-a.wav')  # Replace with your audio file path
+source = oalOpen('./336598__inspectorj__footsteps-concrete-a_mono.wav')  # Replace with your audio file path
 
 # Set the initial position of the source
-source.set_position([1, 0, 0])  # 1 unit away on the x-axis
+source.set_position([1, 0, 0])  # 1 units away on the x-axis
 
 # Get the listener instance
 listener = oalGetListener()
@@ -29,7 +28,7 @@ UDP_IP = "0.0.0.0"  # Bind to any IP
 UDP_PORT = 12345
 BUFFER_SIZE = 72  # 18 floats x 4 bytes
 
-# Sending Socket
+# Sending Socket (not used in this version)
 send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 start_message = "0"
 send_sock.sendto(start_message.encode(), ("192.168.4.1", UDP_PORT))
@@ -37,32 +36,40 @@ send_sock.sendto(start_message.encode(), ("192.168.4.1", UDP_PORT))
 # Receiving Socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
+sock.setblocking(False)  # Make socket non-blocking
 
 def receive_data():
     while True:
-        data, addr = sock.recvfrom(BUFFER_SIZE)
-        float_data = struct.unpack('f' * 18, data)
-        q_w, q_x, q_y, q_z = float_data[12:16]
-        quaternion = [q_w, q_x, q_y, q_z]
+        try:
+            data, addr = sock.recvfrom(BUFFER_SIZE)
+        except BlockingIOError:
+            # No data received, continue waiting
+            pass
+        else:
+            float_data = struct.unpack('f' * 18, data)
+            q_w, q_x, q_y, q_z = float_data[12:16]
+            quaternion = [q_w, q_x, q_y, q_z]
 
-        # Convert quaternion to Euler angles
-        roll, pitch, yaw = quaternion_to_euler(quaternion)
+            # Convert quaternion to Euler angles and update listener orientation
+            roll, pitch, yaw = quaternion_to_euler(quaternion)
+            forward = [np.cos(yaw) * np.cos(pitch), np.sin(yaw) * np.cos(pitch), np.sin(pitch)]
+            up = [0, 0, 1]  # Assuming up vector is always (0, 0, 1)
+            listener.set_orientation(forward + up)
+            print(forward + up)
 
-        # Update listener orientation
-        listener.set_orientation([np.cos(yaw), np.sin(yaw), 0, 0, 0, 1])
-
-        # Play the sound if not already playing
-        if not source.get_state() == AL_PLAYING:
-            source.play()
+            # Optionally play the sound if not already playing
+            if not source.get_state() == AL_PLAYING:
+                source.play()
 
 # Start receiving data in a separate thread
 thread = threading.Thread(target=receive_data)
 thread.start()
 
-# Keep the main thread alive
+# Main loop (no sleep)
 try:
     while True:
-        time.sleep(1)
+        # Update logic can be added here if needed
+        pass
 except KeyboardInterrupt:
     print("Real-time spatial sound stopped.")
 finally:
@@ -70,5 +77,4 @@ finally:
     alcDestroyContext(context)
     alcCloseDevice(device)
     sock.close()
-    send_sock.close()
-    oalQuit()
+    send_sock.close()  # Not used in this version
