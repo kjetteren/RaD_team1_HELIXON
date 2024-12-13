@@ -1,3 +1,5 @@
+from filterpy.kalman import UnscentedKalmanFilter as UKF
+from filterpy.kalman import MerweScaledSigmaPoints
 from openal import *
 import numpy as np
 import socket
@@ -24,6 +26,13 @@ def quaternion_to_euler(q):
     yaw_z = np.arctan2(t3, t4)
 
     return roll_x, pitch_y, yaw_z
+
+dim_x = 4
+dim_z = 4
+points = MerweScaledSigmaPoints(n=dim_x, alpha=0.1, beta=2.0, kappa=0.0)
+ukf = UKF(dim_x=dim_x, dim_z=dim_z, fx=lambda x, dt: x, hx=lambda x: x, dt=1/25, points=points)
+ukf.x = np.array([1, 0, 0, 0])  # Initial state
+ukf.P *= 0.1  # Initial covariance
 
 # Initialize OpenAL
 device = alcOpenDevice(None)
@@ -57,7 +66,10 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
 sock.setblocking(False)  # Make socket non-blocking
 
+first = True
+
 def receive_data():
+    global first
     while True:
         try:
             data, addr = sock.recvfrom(BUFFER_SIZE)
@@ -67,7 +79,18 @@ def receive_data():
         else:
             float_data = struct.unpack('f' * 18, data)
             q_w, q_x, q_y, q_z = float_data[12:16]
-            quaternion = [q_w, q_x, q_y, q_z]
+            quaternion = np.array([q_w, q_x, q_y, q_z], np.float32)
+            norm = np.linalg.norm(quaternion)
+            if norm != 0:
+                quaternion = quaternion / norm
+            else:
+                quaternion = quaternion / 1e-10
+            if first:
+                ukf.x = quaternion
+                first = False
+            else:
+                ukf.predict()
+                ukf.update(quaternion)
 
             # Convert quaternion to Euler angles and update listener orientation
             roll, pitch, yaw = quaternion_to_euler(quaternion)
