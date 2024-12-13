@@ -27,6 +27,7 @@ def quaternion_to_euler(q):
 
     return roll_x, pitch_y, yaw_z
 
+# Initialize UKF
 dim_x = 4
 dim_z = 4
 points = MerweScaledSigmaPoints(n=dim_x, alpha=0.1, beta=2.0, kappa=0.0)
@@ -40,10 +41,12 @@ context = alcCreateContext(device, None)
 alcMakeContextCurrent(context)
 
 # Load the audio source
-source = oalOpen('./DontYouKnowHowBusyAndImportantIAm_mono.wav')  # Replace with your audio file path
+source1 = oalOpen('./DontYouKnowHowBusyAndImportantIAm_mono.wav')
+source2 = oalOpen('./336598__inspectorj__footsteps-concrete-a_mono.wav')
 
 # Set the initial position of the source
-source.set_position([1, 0, 0])  # 1 units away on the x-axis
+source1.set_position([1, 1, 0])  # 1 unit away on the x-axis and 1 unit on the y-axis
+source1.set_position([1, -1, 0])  # 1 unit away on the x-axis and -1 unit on the y-axis
 
 # Get the listener instance
 listener = oalGetListener()
@@ -56,7 +59,7 @@ UDP_IP = "0.0.0.0"  # Bind to any IP
 UDP_PORT = 12345
 BUFFER_SIZE = 72  # 18 floats x 4 bytes
 
-# Sending Socket (not used in this version)
+# Sending Socket
 send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 start_message = "0"
 send_sock.sendto(start_message.encode(), ("192.168.4.1", UDP_PORT))
@@ -99,8 +102,11 @@ def receive_data():
             listener.set_orientation(forward + up)
 
             # Optionally play the sound if not already playing
-            if not source.get_state() == AL_PLAYING:
-                source.play()
+            if not source1.get_state() == AL_PLAYING:
+                source1.play()
+
+            if not source2.get_state() == AL_PLAYING:
+                source2.play()
 
 # Start receiving data in a separate thread
 thread = threading.Thread(target=receive_data)
@@ -114,7 +120,8 @@ try:
 except KeyboardInterrupt:
     print("Real-time spatial sound stopped.")
 finally:
-    source.stop()
+    source1.stop()
+    source2.stop()
     alcDestroyContext(context)
     alcCloseDevice(device)
     sock.close()
