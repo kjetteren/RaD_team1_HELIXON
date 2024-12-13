@@ -15,7 +15,7 @@ void loop() {
     myStepper.step(steps5deg);
     delay(500);
   }
-	delay(1000);
+	
   for (int i=0; i<90/5; i++){
     myStepper.step(-steps5deg);
     delay(500);
