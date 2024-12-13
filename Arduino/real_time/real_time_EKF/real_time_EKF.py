@@ -1,4 +1,4 @@
-from EKF import QuaternionEKF
+from EKF import QuaternionEKF, euler_from_quaternion
 import numpy as np
 import socket
 import struct
@@ -11,13 +11,12 @@ ekf = QuaternionEKF()
 plt.ion()
 fig, ax = plt.subplots()
 lines = [
-    ax.plot([], [], label='Quaternion_W')[0],
-    ax.plot([], [], label='Quaternion_X')[0],
-    ax.plot([], [], label='Quaternion_Y')[0],
-    ax.plot([], [], label='Quaternion_Z')[0],
+    ax.plot([], [], label='Pitch')[0],
+    ax.plot([], [], label='Roll')[0],
+    ax.plot([], [], label='Yaw')[0],
 ]
 ax.legend()
-ax.set_ylim(-1, 1)
+ax.set_ylim(-180, 180)
 
 # UDP Configuration
 UDP_IP = "" # any IP bind
@@ -48,13 +47,17 @@ while True:
 
     if first:
         x = ekf.initialize_state_vector(gyro, q)
+        roll, pitch, yaw = euler_from_quaternion(q[1], q[2], q[3], q[0])
         first = False
     else:
         x = ekf.process_measurement(gyro, accel, mag, q)
+        roll, pitch, yaw = euler_from_quaternion(q[1], q[2], q[3], q[0])
 
     x_data.append(len(x_data))
-    for i in range(4):
-        ekf_data[i].append(x[i+3])
+    ekf_data[0].append(np.degrees(pitch))
+    ekf_data[1].append(np.degrees(roll))
+    ekf_data[2].append(np.degrees(yaw))
+
     for i, line in enumerate(lines):
         line.set_data(x_data, ekf_data[i])
 
