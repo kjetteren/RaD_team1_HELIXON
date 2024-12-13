@@ -9,19 +9,19 @@ class QuaternionEKF:
         self.state = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0])
 
         # state covariance
-        self.P = np.eye(7) * 0.1
+        self.P = np.eye(7) * 10
 
         # process noise
         self.Q = np.eye(7)
-        self.Q[:3, :3] *= 0.25  # angular rates noise
-        self.Q[3:, 3:] *= 0.1  # quaternion noise
+        self.Q[:3, :3] *= 0.15  # angular rates noise
+        self.Q[3:, 3:] *= 0.4  # quaternion noise
 
         # measurement noise
-        self.R = np.eye(7) * 1000
+        self.R = np.eye(7) * 0.001
 
         # system parameters
         self.dt = 0.04  # sample time
-        self.tau = 0.2  # Time constant for angular rates
+        self.tau = 0.03  # Time constant for angular rates
 
     def quaternion_multiply(self, q1, q2):
         """Multiply two quaternions"""
