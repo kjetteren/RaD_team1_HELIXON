@@ -4,9 +4,9 @@ from scipy.spatial.transform import Rotation as R
 from collections import deque
 import time
 import streamlit as st
-# import customize_gui
 import socket
 import struct
+import matplotlib.pyplot as plt
 
 def quaternion_to_euler_angles(q):
     """
@@ -323,3 +323,130 @@ def generate_plot_realtime_lesko():
 
 
 # generate_plot_realtime()
+
+def plot_euler_angles_over_time(quaternion_data: np.ndarray):
+    """
+    Visualize Euler angles over time
+    """
+    # Initialize lists to store Euler angles over time
+    rolls = []
+    pitches = []
+    yaws = []
+
+    for q in quaternion_data:
+        roll, pitch, yaw = quaternion_to_euler_angles(q)
+        rolls.append(np.degrees(roll))
+        pitches.append(np.degrees(pitch))
+        yaws.append(np.degrees(yaw))
+
+    # Plotting Roll
+    plt.figure(figsize=(10, 6))
+    plt.plot(rolls, label='Roll', color='r')
+    plt.title('Roll Over Time')
+    plt.xlabel('Time Step')
+    plt.ylabel('Angle (°)')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # Plotting Pitch
+    plt.figure(figsize=(10, 6))
+    plt.plot(pitches, label='Pitch', color='g')
+    plt.title('Pitch Over Time')
+    plt.xlabel('Time Step')
+    plt.ylabel('Angle (°)')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # Plotting Yaw
+    plt.figure(figsize=(10, 6))
+    plt.plot(yaws, label='Yaw', color='b')
+    plt.title('Yaw Over Time')
+    plt.xlabel('Time Step')
+    plt.ylabel('Angle (°)')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+def plot_euler_angles_3d(quaternion_data: np.ndarray, step: float):
+    # Initialize lists to store Euler angles over time
+    rolls = []
+    pitches = []
+    yaws = []
+
+    for q in quaternion_data:
+        roll, pitch, yaw = quaternion_to_euler_angles(q)
+        rolls.append(roll)
+        pitches.append(pitch)
+        yaws.append(yaw)
+
+    view_plot.generate_plot(rolls, pitches, yaws, step)
+
+def plot_predicted_positions(positions):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Plot measured position
+    ax.plot(positions[0], positions[1], positions[2], label='Trajectory', color='blue')
+
+    # Plot predicted positions
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.legend()
+    plt.show()
+
+def plot_positions_over_time(positions):
+    plt.figure(figsize=(12, 8))
+    plt.plot(positions[:, 0], label='X Position over Time')
+    plt.plot(positions[:, 1], label='Y Position over Time')
+    plt.plot(positions[:, 2], label='Z Position over Time')
+    plt.title('Position Over Time Derived from UKF Quaternions')
+    plt.xlabel('Time Step')
+    plt.ylabel('Position')
+    plt.legend()
+    plt.show()
+
+def plot_predicted_quaternions(predicted_quaternions, l='Predicted'):
+    plt.figure(figsize=(10, 6))
+    plt.plot(predicted_quaternions[:, 0], label='Quaternion_W')
+    plt.plot(predicted_quaternions[:, 1], label='Quaternion_X')
+    plt.plot(predicted_quaternions[:, 2], label='Quaternion_Y')
+    plt.plot(predicted_quaternions[:, 3], label='Quaternion_Z')
+    plt.xlabel('Time Step')
+    plt.ylabel('Quaternion Component')
+    plt.title(f'{l} Quaternion Components Over Time')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+def plot_roll(predicted, measured):
+    plt.figure(figsize=(10, 6))
+    plt.plot(predicted, label='Predicted Roll')
+    plt.plot(measured, label='Measured Roll')
+    plt.xlabel('Time')
+    plt.title('Predicted vs Measured Roll')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+def plot_pitch(predicted, measured):
+    plt.figure(figsize=(10, 6))
+    plt.plot(predicted, label='Predicted Pitch')
+    plt.plot(measured, label='Measured Pitch')
+    plt.xlabel('Time')
+    plt.title('Predicted vs Measured Pitch')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+def plot_yaw(predicted, measured):
+    plt.figure(figsize=(10, 6))
+    plt.plot(predicted, label='Predicted Yaw')
+    plt.plot(measured, label='Measured Yaw')
+    plt.xlabel('Time')
+    plt.title('Predicted vs Measured Yaw')
+    plt.legend()
+    plt.grid()
+    plt.show()
