@@ -50,7 +50,7 @@ while True:
     a_x, a_y, a_z, m_x, m_y, m_z, gy_x, gy_y, gy_z, gr_x, gr_y, gr_z, q_w, q_x, q_y, q_z, pressure, temperature = float_data
     q = np.array([q_w, q_x, q_y, q_z], np.float32)
     norm = np.linalg.norm(q)
-    if norm is not 0:
+    if norm != 0:
         q = q / np.linalg.norm(q)
     else:
         q = q / 1e-10
