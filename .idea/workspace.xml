@@ -5,29 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f7594b9a-fdef-4ab1-a3b0-bb9fca046f34" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/kalman/utils/quaternion.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/BinghamFilter.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/ExtendedKalmanFilter.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/ExtendedKalmanFilter.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/KalmanFilterPositionMeasurements.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/PositionMeasurements.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/KalmanFilterPressureMeasurements.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/PressureMeasurements.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/QUEST.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/QuaternionEKF.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/QuaternionEKF.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/QuaternionUKF.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/QuaternionUKF.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kalman/RotationStep.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kalman/groundTruth_zRotation.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Arduino/motor_rotation/turn_stepper_steps/turn_stepper_steps.ino" beforeDir="false" afterPath="$PROJECT_DIR$/Arduino/motor_rotation/turn_stepper_steps/turn_stepper_steps.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Arduino/real_time/sound_demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/Arduino/real_time/sound_demo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kalman/FilterEvaluations.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/FilterEvaluations.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kalman/Rotation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/Rotation.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/UnscentedKalmanFilter.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/UnscentedKalmanFilter.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/UnscentedKalmanFilter_NoMagnetometer.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/UnscentedKalmanFilter_NoMagnetometer.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/convergence_time.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/data/sensor_data.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/data/sensor_spiral_down.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/data/sensor_spiral_up.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/data/sensor_stand_still.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/data/sensor_straight.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/data/straight.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/data_exploration.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/data_exploration.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/kalman.py" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/utils/kalman.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/spiral_data/sensor_data_down_b.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/spiral_data/sensor_stand_still.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/kalman/view_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/utils/view_plot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kalman/utils/view_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/kalman/utils/view_plot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,22 +48,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.ekf_ros.executor&quot;: &quot;Run&quot;,
-    &quot;Python.kalman.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/wiktoria/Documents/slajdy/research and development/project/RaD_team1_HELIXON&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.ekf_ros.executor": "Run",
+    "Python.kalman.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Merging main",
+    "last_opened_file_path": "/home/wiktoria/Documents/slajdy/research and development/project/RaD_team1_HELIXON",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/kalman/utils" />
@@ -143,7 +127,7 @@
       <workItem from="1734017564788" duration="10394000" />
       <workItem from="1734036652788" duration="2607000" />
       <workItem from="1734072387153" duration="504000" />
-      <workItem from="1734076877350" duration="5365000" />
+      <workItem from="1734076877350" duration="5668000" />
     </task>
     <servers />
   </component>
@@ -166,7 +150,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/kalman/utils/view_plot.py</url>
-          <line>390</line>
+          <line>325</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
